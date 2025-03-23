@@ -1,0 +1,9 @@
+#ifndef CONFIG_H_INCLUDED
+#define CONFIG_H_INCLUDED
+
+
+#define CONFIG_MAX_WITH_VARIABLES       16
+#define CONFIG_MAX_VARIABLE_NAME_LENGTH 16
+
+
+#endif

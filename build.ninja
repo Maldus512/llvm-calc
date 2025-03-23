@@ -1,0 +1,35 @@
+buildFolder = build
+
+cc = clang
+ld = clang++
+cflags =-Isrc -g -O0 -Wextra -pedantic `llvm-config --cflags`
+ldflags = `llvm-config --cxxflags --ldflags --libs core executionengine interpreter analysis native bitwriter --system-libs`
+
+
+rule compile
+    depfile = $out.d
+    deps = gcc
+    command = $cc -MD -MF $out.d $cflags -c $in -o $out
+
+rule link
+    command = $ld $cflags $in -o $out $ldflags
+
+rule compDb
+    command = ninja -t compdb > $out
+
+rule executeExpr
+    command = ./$buildFolder/llvm-calc $in | llc -filetype=obj -relocation-model=pic -o=$buildFolder/calc.o && $cc -o $buildFolder/calc $buildFolder/calc.o rt/calc.c && ./$buildFolder/calc
+    pool = console
+
+
+build compile_commands.json: compDb
+build $buildFolder/src/main.o: compile src/main.c
+build $buildFolder/src/lexer.o: compile src/lexer.c
+build $buildFolder/src/parser.o: compile src/parser.c
+build $buildFolder/src/sema.o: compile src/sema.c
+build $buildFolder/src/codegen.o: compile src/codegen.c
+build $buildFolder/llvm-calc: link $buildFolder/src/main.o $buildFolder/src/lexer.o $buildFolder/src/parser.o $buildFolder/src/sema.o $buildFolder/src/codegen.o
+
+default $buildFolder/llvm-calc
+build run: executeExpr test.calc | $buildFolder/llvm-calc
+
