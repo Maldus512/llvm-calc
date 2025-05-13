@@ -30,6 +30,6 @@ build $buildFolder/src/sema.o: compile src/sema.c
 build $buildFolder/src/codegen.o: compile src/codegen.c
 build $buildFolder/llvm-calc: link $buildFolder/src/main.o $buildFolder/src/lexer.o $buildFolder/src/parser.o $buildFolder/src/sema.o $buildFolder/src/codegen.o
 
-default $buildFolder/llvm-calc
+default $buildFolder/llvm-calc compile_commands.json
 build run: executeExpr test.calc | $buildFolder/llvm-calc
 
